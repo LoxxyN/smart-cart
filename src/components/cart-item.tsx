@@ -1,5 +1,6 @@
 import { memo, useCallback } from 'react';
-import { type ICartItem, useCartDispatch } from '../context/cart-context.tsx';
+import { useCartDispatch } from '../context/cart-context.tsx';
+import { type ICartItem } from '../context/cart-reducer.ts';
 
 type CartItemProps = {
   item: ICartItem;
