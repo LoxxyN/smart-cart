@@ -36,7 +36,7 @@ const loadInitialState = () => {
     try {
       return JSON.parse(saved);
     } catch (err) {
-      console.error(err)
+      console.error(err);
       return initialState;
     }
   }
@@ -46,8 +46,25 @@ const loadInitialState = () => {
 
 const cartReducer = (state: CartState, action: CartActions): CartState => {
   switch (action.type) {
-    case 'ADD_ITEM':
+    case 'ADD_ITEM': {
+      const existingItem = state.items.find(
+        (item) => item.name.toLowerCase() === action.payload.name.toLowerCase(),
+      );
+
+      if (existingItem) {
+        return {
+          ...state,
+          items: state.items.map((item) =>
+            item.id === existingItem.id
+              ? { ...item, quantity: item.quantity + action.payload.quantity }
+              : item,
+          ),
+        };
+      }
+
       return { ...state, items: [...state.items, action.payload] };
+    }
+
     case 'REMOVE_ITEM':
       return {
         ...state,
