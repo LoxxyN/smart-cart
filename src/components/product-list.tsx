@@ -1,5 +1,5 @@
 import { memo, useMemo, useState } from 'react';
-import { useCart } from '../context/cart-context.tsx';
+import { useCartState } from '../context/cart-context.tsx';
 import CartItem from './cart-item.tsx';
 import { SearchField } from './search-field.tsx';
 
@@ -15,7 +15,7 @@ const SORT_OPTIONS: { value: SortType; label: string }[] = [
 const ProductList = memo(() => {
   const [sortBy, setSortBy] = useState<SortType>('default');
   const [searchTerm, setSearchTerm] = useState('');
-  const { state } = useCart();
+  const state = useCartState();
 
   const sortedItems = useMemo(() => {
     let items = [...state.items];

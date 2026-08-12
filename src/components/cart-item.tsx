@@ -1,12 +1,12 @@
 import { memo, useCallback } from 'react';
-import { type ICartItem, useCart } from '../context/cart-context.tsx';
+import { type ICartItem, useCartDispatch } from '../context/cart-context.tsx';
 
 type CartItemProps = {
   item: ICartItem;
 };
 
 const CartItem: React.FC<CartItemProps> = memo(({ item }) => {
-  const { dispatch } = useCart();
+  const dispatch = useCartDispatch();
 
   const handleDecrease = useCallback(() => {
     dispatch({

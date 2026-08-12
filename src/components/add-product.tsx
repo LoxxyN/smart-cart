@@ -1,8 +1,8 @@
 import { useCallback, useId, useState } from 'react';
-import { useCart } from '../context/cart-context.tsx';
+import { useCartDispatch } from '../context/cart-context.tsx';
 
 export const AddProduct = () => {
-  const { state, dispatch } = useCart();
+  const dispatch = useCartDispatch();
   const formId = useId();
 
   const [name, setName] = useState('');
@@ -27,11 +27,9 @@ export const AddProduct = () => {
         return;
       }
 
-      const nextId = state.items.reduce((max, item) => Math.max(max, item.id), 0) + 1;
-
       dispatch({
         type: 'ADD_ITEM',
-        payload: { id: nextId, name: trimmedName, price: parsedPrice, quantity: parsedQuantity },
+        payload: { name: trimmedName, price: parsedPrice, quantity: parsedQuantity },
       });
 
       setName('');
@@ -39,7 +37,7 @@ export const AddProduct = () => {
       setQuantity(1);
       setError(null);
     },
-    [state.items, name, price, quantity, dispatch],
+    [name, price, quantity, dispatch],
   );
 
   return (

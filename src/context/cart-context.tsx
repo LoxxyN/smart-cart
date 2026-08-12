@@ -12,15 +12,10 @@ type CartState = {
 };
 
 type CartActions =
-  | { type: 'ADD_ITEM'; payload: ICartItem }
+  | { type: 'ADD_ITEM'; payload: Omit<ICartItem, 'id'> }
   | { type: 'REMOVE_ITEM'; payload: number }
   | { type: 'UPDATE_ITEM'; payload: { id: number; quantity: number } }
   | { type: 'CLEAR_CART' };
-
-interface CartContextDispatch {
-  state: CartState;
-  dispatch: React.Dispatch<CartActions>;
-}
 
 const initialState: CartState = {
   items: [
@@ -51,6 +46,8 @@ const cartReducer = (state: CartState, action: CartActions): CartState => {
         (item) => item.name.toLowerCase() === action.payload.name.toLowerCase(),
       );
 
+      const nextId = state.items.reduce((max, item) => Math.max(max, item.id), 0) + 1;
+
       if (existingItem) {
         return {
           ...state,
@@ -62,7 +59,7 @@ const cartReducer = (state: CartState, action: CartActions): CartState => {
         };
       }
 
-      return { ...state, items: [...state.items, action.payload] };
+      return { ...state, items: [...state.items, { ...action.payload, id: nextId }] };
     }
 
     case 'REMOVE_ITEM':
@@ -86,23 +83,30 @@ const cartReducer = (state: CartState, action: CartActions): CartState => {
   }
 };
 
-const CartContext = createContext<CartContextDispatch | null>(null);
-
+const CartStateContext = createContext<CartState | null>(null);
+const CartDispatchContext = createContext<React.Dispatch<CartActions> | null>(null);
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, dispatch] = useReducer(cartReducer, loadInitialState());
-  const value: CartContextDispatch = { state, dispatch };
 
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(state));
   }, [state]);
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  return (
+    <CartDispatchContext.Provider value={dispatch}>
+      <CartStateContext.Provider value={state}>{children}</CartStateContext.Provider>
+    </CartDispatchContext.Provider>
+  );
 };
 
-export const useCart = () => {
-  const context = useContext(CartContext);
-  if (!context) {
-    throw new Error('Вы можете использовать useCart(), только в рамках CartProvider');
-  }
-  return context;
+export const useCartState = () => {
+  const ctx = useContext(CartStateContext);
+  if (!ctx) throw new Error('useCartState вне CartProvider');
+  return ctx;
+};
+
+export const useCartDispatch = () => {
+  const ctx = useContext(CartDispatchContext);
+  if (!ctx) throw new Error('useCartDispatch вне CartProvider');
+  return ctx;
 };

@@ -1,8 +1,9 @@
 import { useCallback, useMemo } from 'react';
-import { useCart } from '../context/cart-context.tsx';
+import { useCartDispatch, useCartState } from '../context/cart-context.tsx';
 
 export const CartSummary = () => {
-  const { state, dispatch } = useCart();
+  const dispatch = useCartDispatch();
+  const state = useCartState();
 
   const { total, discount, finalTotal } = useMemo(() => {
     const total = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
